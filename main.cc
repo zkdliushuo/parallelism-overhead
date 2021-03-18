@@ -23,18 +23,23 @@ int main(int argc, char** argv) {
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
+  auto recv_send_type = MPI_LONG_LONG_INT;
+  MPI_Bcast( &buffer, 1, recv_send_type, 0, MPI_COMM_WORLD );
+
   std::cout << "my id is " << world_rank << std::endl;
+  std::cout << "buffer pointer is " << buffer << std::endl;
   int nTrials = 10, iTrial;
   for(iTrial = 1; iTrial <= nTrials; iTrial++) {
         int i, j;
-        int k = HEIGHT / THREADS;
+        int k = HEIGHT / world_size;
+        // std::cout << k << " ";
         for(i = world_rank * k ; i < (world_rank + 1) * k; i++){
             for(j = 0;j < LENGTH; j++){
-                buffer[i*LENGTH + j] = world_rank;
+                buffer[i*LENGTH + j] = 1;
             }
         }
-        MPI_Barrier(MPI_COMM_WORLD);
   }
+  MPI_Barrier(MPI_COMM_WORLD);
   if(world_rank == 0) {
       int i, j;
       for( i = 0;  i < HEIGHT; i++){
