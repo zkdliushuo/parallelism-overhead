@@ -9,7 +9,7 @@
 
 
 int main(int argc, char** argv) {
-
+  // omp_set_num_threads(16);
   int world_rank;
   int world_size;
 
@@ -23,7 +23,7 @@ int main(int argc, char** argv) {
   }
 
   MPI_Barrier(MPI_COMM_WORLD);
-
+  std::cout << "my id is " << world_rank << std::endl;
   int nTrials = 10, iTrial;
   for(iTrial = 1; iTrial <= nTrials; iTrial++) {
         int i, j;
@@ -35,15 +35,17 @@ int main(int argc, char** argv) {
         }
         MPI_Barrier(MPI_COMM_WORLD);
   }
-    if(world_rank == 0) {
-        int i, j;
-        for( i = 0;  i < HEIGHT; i++){
-            for( j = 0;j < LENGTH; j++){
-                std::cout << buffer[i*LENGTH + j] << " ";
-            }
-            std::cout << std::endl;
-        }
-    }
+  if(world_rank == 0) {
+      int i, j;
+      for( i = 0;  i < HEIGHT; i++){
+          for( j = 0; j < LENGTH; j++){
+              std::cout << buffer[i*LENGTH + j] << " ";
+          }
+          std::cout << std::endl;
+      }
+
+      free(buffer);
+  }
 
   MPI_Finalize();
 }
