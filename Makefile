@@ -1,12 +1,26 @@
-CXX=mpicxx
-CXXFLAGS=-Iinclude/ -O3 -g -mavx -mfma -fopenmp
+CXX=		g++ $(CCFLAGS)
+BASELINE=	baseline.o
+OBJS =		$(BASELINE) 
 
-SRCS=main.cc
+LIBS=		-pthread
 
-main: $(SRCS)
-	$(CXX) $(CXXFLAGS) -o main -no-pie $(SRCS) $(LDFLAGS)
+CCFLAGS= -g
 
-all: main
+all:		baseline 
+
+baseline:	$(BASELINE)
+		$(CXX) -o baseline $(BASELINE) $(LIBS)
 
 clean:
-	rm -f $(OBJECTS)
+		rm -f $(OBJS) $(OBJS:.o=.d)
+
+realclean:
+		rm -f $(OBJS) $(OBJS:.o=.d) baseline 
+
+# These lines ensure that dependencies are handled automatically.
+%.d:	%.cc
+	$(SHELL) -ec '$(CC) -M $(CPPFLAGS) $< \
+		| sed '\''s/\($*\)\.o[ :]*/\1.o $@ : /g'\'' > $@; \
+		[ -s $@ ] || rm -f $@'
+
+include	$(OBJS:.o=.d)
